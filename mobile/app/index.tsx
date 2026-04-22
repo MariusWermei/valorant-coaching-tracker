@@ -1,11 +1,14 @@
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 
 export default function ModalScreen() {
-  console.log("ModalScreen");
+  const router = useRouter();
   return (
     <SafeAreaView>
-      <Text style={styles.text}>OUI</Text>
+      <TouchableOpacity onPress={() => router.push("/(tabs)")}>
+        <Text style={styles.text}>OUI</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
