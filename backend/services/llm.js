@@ -9,14 +9,20 @@ const askLLM = async (prompt) => {
         stream: false,
         keep_alive: "30m",
         options: {
-          num_predict: 300,
+          num_predict: 400,
+          temperature: 0.3,
         },
       }),
     });
 
     const data = await response.json();
 
-    return { response: data.response };
+    let text = data.response;
+    text = text
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+    return { response: text };
   } catch (error) {
     return { error: error.message };
   }

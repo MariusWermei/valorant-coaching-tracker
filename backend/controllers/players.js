@@ -1,7 +1,7 @@
 const PlayerStats = require("../models/players");
 const { computeAnalysis } = require("../services/analysis");
 const { askLLM } = require("../services/llm");
-const { buildAnalysisPrompt } = require("../services/prompts");
+const { buildFullCoachingPrompt } = require("../services/prompts");
 
 const playerInfos = async (req, res) => {
   try {
@@ -77,8 +77,9 @@ const playerAnalysis = async (req, res) => {
 
     const stats = computeAnalysis(matches);
 
-    const prompt = buildAnalysisPrompt(stats);
+    const prompt = buildFullCoachingPrompt(stats);
     const coaching = await askLLM(prompt);
+
     let parsedCoaching;
     try {
       parsedCoaching = JSON.parse(coaching.response);
