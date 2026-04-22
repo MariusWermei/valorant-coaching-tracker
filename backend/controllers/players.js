@@ -1,5 +1,7 @@
 const PlayerStats = require("../models/players");
 const { computeAnalysis } = require("../services/analysis");
+const { askLLM } = require("../services/llm");
+const { buildAnalysisPrompt } = require("../services/prompts");
 
 const playerInfos = async (req, res) => {
   try {
@@ -73,9 +75,18 @@ const playerAnalysis = async (req, res) => {
 
     let matches = player.matches;
 
-    const data = computeAnalysis(matches);
+    const stats = computeAnalysis(matches);
 
-    res.json({ result: true, playerStats: data });
+    const prompt = buildAnalysisPrompt(stats);
+    const coaching = await askLLM(prompt);
+    let parsedCoaching;
+    try {
+      parsedCoaching = JSON.parse(coaching.response);
+    } catch {
+      parsedCoaching = coaching.response;
+    }
+
+    res.json({ result: true, stats: stats, coaching: parsedCoaching });
   } catch (error) {
     return res.status(500).json({ result: false, error: error.message });
   }

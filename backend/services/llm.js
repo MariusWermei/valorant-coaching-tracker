@@ -7,6 +7,10 @@ const askLLM = async (prompt) => {
         model: "qwen2.5",
         prompt: prompt,
         stream: false,
+        keep_alive: "30m",
+        options: {
+          num_predict: 300,
+        },
       }),
     });
 
