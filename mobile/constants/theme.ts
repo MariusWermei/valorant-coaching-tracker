@@ -15,6 +15,7 @@ export const theme = {
     },
   },
   fonts: {
+    headingLight: "SpaceGrotesk_400Regular",
     heading: "SpaceGrotesk_700Bold",
     body: "Manrope_400Regular",
     bodyBold: "Manrope_700Bold",

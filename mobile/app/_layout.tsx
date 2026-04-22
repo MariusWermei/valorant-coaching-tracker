@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { useCallback } from "react";
 import {
   useFonts,
+  SpaceGrotesk_400Regular,
   SpaceGrotesk_700Bold,
 } from "@expo-google-fonts/space-grotesk";
 import {
@@ -14,6 +15,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
+    SpaceGrotesk_400Regular,
     SpaceGrotesk_700Bold,
     Manrope_400Regular,
     Manrope_700Bold,
