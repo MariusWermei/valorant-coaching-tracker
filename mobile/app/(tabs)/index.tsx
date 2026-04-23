@@ -15,6 +15,7 @@ import Button from "@/components/Button";
 import MetricCard from "@/components/MetricCard";
 import { StatsResponse } from "@/types/stats";
 import { Match } from "@/types/match";
+import MatchCard from "@/components/MatchCard";
 
 export default function OverviewTab() {
   const router = useRouter();
@@ -90,8 +91,12 @@ export default function OverviewTab() {
         </View>
 
         {/* Recent sessions */}
-        <Text style={styles.sectionLabel}>RECENT SESSIONS</Text>
-        {/* On affichera les matchs juste après */}
+        <Text style={styles.sectionLabel}>— RECENT SESSIONS</Text>
+        <View style={styles.matchesList}>
+          {matches.slice(0, 10).map((match) => (
+            <MatchCard key={match.matchId} match={match} />
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -104,6 +109,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     padding: theme.spacing.xl,
+    paddingBottom: 80,
   },
   loadingWrapper: {
     flex: 1,
@@ -146,5 +152,8 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     letterSpacing: 2,
     marginBottom: theme.spacing.md,
+  },
+  matchesList: {
+    gap: theme.spacing.md,
   },
 });
