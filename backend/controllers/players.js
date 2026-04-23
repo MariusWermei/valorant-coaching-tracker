@@ -62,6 +62,29 @@ const playerMatchesInfos = async (req, res) => {
   }
 };
 
+const playerStats = async (req, res) => {
+  try {
+    const playerId = req.params.playerId;
+
+    const player = await PlayerStats.findOne({
+      playerId: playerId,
+    });
+    if (!player) {
+      return res.status(404).json({ result: false, message: "User not found" });
+    }
+
+    let matches = player.matches;
+    let data = computeAnalysis(matches);
+    res.json({
+      result: true,
+      stats: data,
+      player: { displayName: player.displayName, riotTag: player.riotTag },
+    });
+  } catch (error) {
+    return res.status(500).json({ result: false, error: error.message });
+  }
+};
+
 const playerAnalysis = async (req, res) => {
   try {
     const playerId = req.params.playerId;
@@ -97,5 +120,6 @@ module.exports = {
   playerInfos,
   singlePlayerInfo,
   playerMatchesInfos,
+  playerStats,
   playerAnalysis,
 };
