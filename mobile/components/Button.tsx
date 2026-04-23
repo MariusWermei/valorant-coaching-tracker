@@ -6,18 +6,27 @@ type ButtonProps = {
   label: string;
   onPress: () => void;
   variant?: "primary" | "secondary";
+  disabled?: boolean;
 };
 
 export default function Button({
   label,
   onPress,
   variant = "primary",
+  disabled = false,
 }: ButtonProps) {
+  const handlePress = () => {
+    if (!disabled) onPress();
+  };
   if (variant === "primary") {
     return (
       <Pressable
         onPress={onPress}
-        style={({ pressed }) => [styles.wrapper, pressed && styles.pressed]}
+        style={({ pressed }) => [
+          styles.wrapper,
+          pressed && !disabled && styles.pressed,
+          disabled && styles.disabled,
+        ]}
       >
         <LinearGradient
           colors={["#ff8a8a", theme.colors.primary, "#d93e4a"]}
@@ -34,8 +43,12 @@ export default function Button({
 
   return (
     <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.wrapper, pressed && styles.pressed]}
+      onPress={handlePress}
+      style={({ pressed }) => [
+        styles.wrapper,
+        pressed && !disabled && styles.pressed,
+        disabled && styles.disabled,
+      ]}
     >
       <View style={[styles.button, styles.secondary]}>
         <Text style={styles.label}>{label}</Text>
@@ -49,6 +62,9 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     overflow: "hidden",
     width: "100%",
+  },
+  disabled: {
+    opacity: 0.4,
   },
   pressed: {
     opacity: 0.85,

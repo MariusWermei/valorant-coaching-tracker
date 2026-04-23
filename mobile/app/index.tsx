@@ -5,9 +5,24 @@ import { Ionicons } from "@expo/vector-icons";
 import { theme } from "@/constants/theme";
 import Button from "@/components/Button";
 import Card from "@/components/Card";
+import { useEffect, useState } from "react";
+import { usePlayer } from "@/contexts/PlayerContext";
+import { getPlayers } from "@/services/api";
+import { Player } from "../types/player";
 
 export default function RSOScreen() {
   const router = useRouter();
+  const { setPlayerId } = usePlayer();
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      const data = await getPlayers();
+      setPlayers(data.data);
+    };
+    fetchPlayers();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -47,10 +62,40 @@ export default function RSOScreen() {
           />
         </View>
 
+        <View style={styles.cards}>
+          {players.map((p) => (
+            <Pressable
+              key={p.playerId}
+              onPress={() =>
+                setSelectedPlayer(
+                  selectedPlayer === p.playerId ? null : p.playerId,
+                )
+              }
+            >
+              <Card
+                title={p.displayName}
+                description={p.riotTag}
+                // optionnel : un style différent si sélectionné
+                style={
+                  selectedPlayer === p.playerId
+                    ? { borderWidth: 1, borderColor: theme.colors.primary }
+                    : undefined
+                }
+              />
+            </Pressable>
+          ))}
+        </View>
+
         <View style={styles.footer}>
           <Button
             label="Continue with Riot →"
-            onPress={() => router.push("/(tabs)")}
+            disabled={!selectedPlayer}
+            onPress={() => {
+              if (selectedPlayer) {
+                setPlayerId(selectedPlayer);
+                router.push("/(tabs)");
+              }
+            }}
           />
           <Pressable>
             <Text style={styles.learnMore}>Learn more about Riot Sign-On</Text>
