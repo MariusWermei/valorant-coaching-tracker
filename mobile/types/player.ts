@@ -5,3 +5,8 @@ export type Player = {
   profileType: string;
   notes?: string;
 };
+
+export type PlayersResponse = {
+  result: boolean;
+  data: Player[];
+};
