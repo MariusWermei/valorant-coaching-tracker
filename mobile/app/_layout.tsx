@@ -12,6 +12,7 @@ import {
 import { Inter_400Regular, Inter_600SemiBold } from "@expo-google-fonts/inter";
 import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { PlayerProvider } from "@/contexts/PlayerContext";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -33,10 +34,12 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+      <PlayerProvider>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </PlayerProvider>
     </GestureHandlerRootView>
   );
 }
