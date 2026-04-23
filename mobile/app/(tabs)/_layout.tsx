@@ -12,16 +12,16 @@ export default function TabLayout() {
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.primarySoft,
         tabBarStyle: {
-          backgroundColor: "#fff",
-          borderTopWidth: 0,
+          backgroundColor: theme.colors.surface.card,
+          borderTopWidth: 1,
+          borderTopColor: theme.colors.surface.high,
           position: "absolute",
           height: 85,
-          paddingBottom: 10,
+          paddingTop: 10,
         },
         tabBarBackground: () => (
           <BlurView
-            intensity={80}
-            tint="light"
+            intensity={30}
             style={{
               position: "absolute",
               top: 0,
