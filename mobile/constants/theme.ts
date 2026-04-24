@@ -9,6 +9,7 @@ export const theme = {
     primary: "#ff525d",
     primarySoft: "#ffb3b2",
     success: "#60dcb0",
+    warning: "#eb9e22ff",
     text: {
       primary: "#d9e3f2",
       secondary: "#8a9bb0",
