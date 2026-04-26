@@ -1,7 +1,4 @@
 import { Tabs } from "expo-router";
-import { View } from "react-native";
-import React from "react";
-import { BlurView } from "expo-blur";
 import { theme } from "../../constants/theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -9,90 +6,51 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.primarySoft,
+        headerShown: false,
+        tabBarActiveTintColor: theme.colors.accent.green,
+        tabBarInactiveTintColor: theme.colors.text.secondary,
         tabBarStyle: {
-          backgroundColor: theme.colors.surface.card,
-          borderTopWidth: 1,
-          borderTopColor: theme.colors.surface.high,
-          position: "absolute",
-          height: 85,
+          backgroundColor: theme.colors.surface.low,
+          borderTopWidth: 0,
+          height: 72,
+          paddingBottom: 12,
           paddingTop: 10,
         },
-        tabBarBackground: () => (
-          <BlurView
-            intensity={30}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-            }}
-          />
-        ),
+        tabBarLabelStyle: {
+          fontFamily: theme.fonts.labelBold,
+          fontSize: 9,
+          letterSpacing: 1.5,
+          marginTop: 2,
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          headerShown: false,
-          title: "",
-          tabBarIcon: ({ color, size, focused }) => (
-            <View
-              style={{
-                shadowColor: theme.colors.primarySoft,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: focused ? 0.4 : 0,
-                shadowRadius: 8,
-                elevation: focused ? 8 : 0,
-              }}
-            >
-              <Ionicons name="stats-chart" size={size} color={color} />
-            </View>
+          title: "OVERVIEW",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="stats-chart" size={size} color={color} />
           ),
         }}
-      ></Tabs.Screen>
+      />
       <Tabs.Screen
         name="analysis"
         options={{
-          headerShown: false,
-          title: "",
-          tabBarIcon: ({ color, size, focused }) => (
-            <View
-              style={{
-                shadowColor: theme.colors.primarySoft,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: focused ? 0.4 : 0,
-                shadowRadius: 8,
-                elevation: focused ? 8 : 0,
-              }}
-            >
-              <Ionicons name="analytics" size={size} color={color} />
-            </View>
+          title: "ANALYSIS",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="analytics-outline" size={size} color={color} />
           ),
         }}
-      ></Tabs.Screen>
+      />
       <Tabs.Screen
         name="actionplan"
         options={{
-          headerShown: false,
-          title: "",
-          tabBarIcon: ({ color, size, focused }) => (
-            <View
-              style={{
-                shadowColor: theme.colors.primarySoft,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: focused ? 0.4 : 0,
-                shadowRadius: 8,
-                elevation: focused ? 8 : 0,
-              }}
-            >
-              <Ionicons name="clipboard-outline" size={size} color={color} />
-            </View>
+          title: "PLAN",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="list-outline" size={size} color={color} />
           ),
         }}
-      ></Tabs.Screen>
+      />
     </Tabs>
   );
 }

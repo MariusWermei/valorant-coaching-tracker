@@ -50,8 +50,8 @@ export default function OverviewTab() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.loadingWrapper}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
+        <View style={styles.centerWrapper}>
+          <ActivityIndicator size="large" color={theme.colors.accent.green} />
           <Text style={styles.loadingText}>Loading performance data...</Text>
         </View>
       </SafeAreaView>
@@ -65,37 +65,72 @@ export default function OverviewTab() {
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.displayName}>{stats.player.displayName}</Text>
-          <Text style={styles.riotTag}>{stats.player.riotTag}</Text>
+          <View>
+            <Text style={styles.appLabel}>FORM</Text>
+            <Text style={styles.displayName}>{stats.player.displayName}</Text>
+            <Text style={styles.riotTag}>{stats.player.riotTag}</Text>
+          </View>
+          <View style={styles.deltaColumn}>
+            <View style={styles.deltaChipNegative}>
+              <Text style={styles.deltaChipTextNegative}>
+                ↓ −4% WR THIS WEEK
+              </Text>
+            </View>
+            <View style={styles.deltaChipPositive}>
+              <Text style={styles.deltaChipTextPositive}>
+                ↑ +0.3 K/D THIS WEEK
+              </Text>
+            </View>
+          </View>
         </View>
 
-        {/* Metrics */}
-        <View style={styles.metricsRow}>
-          <MetricCard
-            label="WIN RATE"
-            value={`${stats.stats.winrate.toFixed(0)}%`}
-          />
-          <MetricCard label="K/D" value={stats.stats.kdRatio.toFixed(2)} />
-          <MetricCard
-            label="AVG SCORE"
-            value={Math.round(stats.stats.averageScore)}
-          />
+        {/* Metrics grid — 2x2 */}
+        <View style={styles.metricsGrid}>
+          <View style={styles.metricsRow}>
+            <MetricCard
+              label="WIN RATE"
+              value={`${stats.stats.winrate.toFixed(0)}%`}
+              delta={`last ${stats.stats.totalMatches} games`}
+            />
+            <MetricCard
+              label="K / D"
+              value={stats.stats.kdRatio.toFixed(2)}
+            />
+          </View>
+          <View style={styles.metricsRow}>
+            <MetricCard
+              label="AVG SCORE"
+              value={Math.round(stats.stats.averageScore)}
+            />
+            <MetricCard
+              label="MATCHES"
+              value={stats.stats.totalMatches}
+              delta="this week"
+            />
+          </View>
         </View>
 
         {/* CTA */}
-        <View style={styles.ctaWrapper}>
-          <Button
-            label="VIEW PERFORMANCE ANALYSIS →"
-            onPress={() => router.push("/(tabs)/analysis")}
-          />
+        <View style={styles.ctaCard}>
+          <View>
+            <Text style={styles.ctaLabel}>WEEKLY ANALYSIS READY</Text>
+            <Text style={styles.ctaTitle}>
+              Read your coaching report →
+            </Text>
+          </View>
+          <View style={styles.ctaCircle}>
+            <Text style={styles.ctaArrow}>→</Text>
+          </View>
         </View>
 
-        {/* Recent sessions */}
-        <Text style={styles.sectionLabel}>— RECENT SESSIONS</Text>
-        <View style={styles.matchesList}>
-          {matches.slice(0, 10).map((match) => (
-            <MatchCard key={match.matchId} match={match} />
-          ))}
+        {/* Recent matches */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>RECENT MATCHES</Text>
+          <View style={styles.matchesList}>
+            {matches.slice(0, 10).map((match) => (
+              <MatchCard key={match.matchId} match={match} />
+            ))}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -109,9 +144,10 @@ const styles = StyleSheet.create({
   },
   scroll: {
     padding: theme.spacing.xl,
-    paddingBottom: 80,
+    paddingBottom: 90,
+    gap: theme.spacing.xl,
   },
-  loadingWrapper: {
+  centerWrapper: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -123,11 +159,20 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
   },
   header: {
-    marginBottom: theme.spacing.xl,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  appLabel: {
+    fontFamily: theme.fonts.labelBold,
+    fontSize: 10,
+    color: theme.colors.accent.green,
+    letterSpacing: 2.5,
+    marginBottom: 4,
   },
   displayName: {
     fontFamily: theme.fonts.heading,
-    fontSize: 36,
+    fontSize: 24,
     color: theme.colors.text.primary,
     letterSpacing: -0.5,
   },
@@ -135,25 +180,86 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.label,
     fontSize: 12,
     color: theme.colors.text.secondary,
-    letterSpacing: 1.5,
-    marginTop: 4,
+    marginTop: 2,
+  },
+  deltaColumn: {
+    gap: theme.spacing.xs,
+    alignItems: "flex-end",
+  },
+  deltaChipNegative: {
+    backgroundColor: theme.colors.accent.redDim,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: theme.radius.sm,
+  },
+  deltaChipTextNegative: {
+    fontFamily: theme.fonts.labelBold,
+    fontSize: 9,
+    color: theme.colors.negative,
+    letterSpacing: 1,
+  },
+  deltaChipPositive: {
+    backgroundColor: theme.colors.accent.greenDim,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: theme.radius.sm,
+  },
+  deltaChipTextPositive: {
+    fontFamily: theme.fonts.labelBold,
+    fontSize: 9,
+    color: theme.colors.positive,
+    letterSpacing: 1,
+  },
+  metricsGrid: {
+    gap: theme.spacing.sm,
   },
   metricsRow: {
     flexDirection: "row",
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.xl,
+    gap: theme.spacing.sm,
   },
-  ctaWrapper: {
-    marginBottom: theme.spacing.xl,
+  ctaCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: theme.colors.surface.card,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.lg,
+  },
+  ctaLabel: {
+    fontFamily: theme.fonts.labelBold,
+    fontSize: 9,
+    color: theme.colors.accent.green,
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  ctaTitle: {
+    fontFamily: theme.fonts.bodyBold,
+    fontSize: 15,
+    color: theme.colors.text.primary,
+  },
+  ctaCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.accent.green,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaArrow: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 16,
+    color: theme.colors.surface.base,
+  },
+  section: {
+    gap: theme.spacing.md,
   },
   sectionLabel: {
     fontFamily: theme.fonts.labelBold,
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.text.secondary,
     letterSpacing: 2,
-    marginBottom: theme.spacing.md,
   },
   matchesList: {
-    gap: theme.spacing.md,
+    gap: theme.spacing.lg,
   },
 });

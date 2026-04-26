@@ -23,7 +23,7 @@ export default function AnalysisTab() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centerWrapper}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <ActivityIndicator size="large" color={theme.colors.accent.green} />
           <Text style={styles.loadingText}>
             Generating coaching insights...
           </Text>
@@ -91,10 +91,10 @@ export default function AnalysisTab() {
         {/* Strengths */}
         {isCoachingObject && coaching.strengths?.length > 0 && (
           <View style={styles.section}>
-            <SectionLabel color={theme.colors.success}>STRENGTHS</SectionLabel>
+            <SectionLabel color={theme.colors.positive}>STRENGTHS</SectionLabel>
             <InsightList
               items={coaching.strengths}
-              accentColor={theme.colors.success}
+              accentColor={theme.colors.positive}
             />
           </View>
         )}
@@ -102,10 +102,10 @@ export default function AnalysisTab() {
         {/* Weaknesses */}
         {isCoachingObject && coaching.weaknesses?.length > 0 && (
           <View style={styles.section}>
-            <SectionLabel color={theme.colors.primary}>WEAKNESSES</SectionLabel>
+            <SectionLabel color={theme.colors.negative}>WEAKNESSES</SectionLabel>
             <InsightList
               items={coaching.weaknesses}
-              accentColor={theme.colors.primary}
+              accentColor={theme.colors.negative}
             />
           </View>
         )}
@@ -116,7 +116,7 @@ export default function AnalysisTab() {
             <SectionLabel>COACHING RECOMMENDATIONS</SectionLabel>
             <InsightList
               items={coaching.focusAreas}
-              accentColor={theme.colors.primary}
+              accentColor={theme.colors.negative}
               variant="numbered"
             />
           </View>
