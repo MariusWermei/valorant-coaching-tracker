@@ -5,10 +5,6 @@ import {
   SpaceGrotesk_400Regular,
   SpaceGrotesk_700Bold,
 } from "@expo-google-fonts/space-grotesk";
-import {
-  Manrope_400Regular,
-  Manrope_700Bold,
-} from "@expo-google-fonts/manrope";
 import { Inter_400Regular, Inter_600SemiBold } from "@expo-google-fonts/inter";
 import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -18,8 +14,6 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     SpaceGrotesk_400Regular,
     SpaceGrotesk_700Bold,
-    Manrope_400Regular,
-    Manrope_700Bold,
     Inter_400Regular,
     Inter_600SemiBold,
   });
