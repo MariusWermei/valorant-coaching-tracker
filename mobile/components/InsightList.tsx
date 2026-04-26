@@ -18,41 +18,16 @@ export default function InsightList({
         const isPriority = variant === "numbered" && index === 0;
 
         return (
-          <View
-            key={index}
-            style={[styles.item, isPriority && styles.priorityItem]}
-          >
-            {/* Left accent bar — no border, just a tonal stripe */}
-            <View
-              style={[
-                styles.accent,
-                { backgroundColor: accentColor },
-                isPriority && styles.accentPriority,
-              ]}
-            />
-
+          <View key={index} style={styles.item}>
+            {variant === "numbered" ? (
+              <Text style={[styles.number, { color: accentColor }]}>
+                {String(index + 1).padStart(2, "0")}
+              </Text>
+            ) : (
+              <View style={[styles.dot, { backgroundColor: accentColor }]} />
+            )}
             <View style={styles.body}>
-              {variant === "numbered" ? (
-                <View style={styles.numberedHeader}>
-                  <Text style={[styles.number, { color: accentColor }]}>
-                    {String(index + 1).padStart(2, "0")}
-                  </Text>
-                  {isPriority && (
-                    <Text
-                      style={[styles.priorityTag, { color: accentColor }]}
-                    >
-                      TOP PRIORITY
-                    </Text>
-                  )}
-                </View>
-              ) : null}
-
-              <Text
-                style={[
-                  styles.text,
-                  isPriority && styles.priorityText,
-                ]}
-              >
+              <Text style={[styles.text, isPriority && styles.priorityText]}>
                 {item}
               </Text>
             </View>
@@ -65,44 +40,32 @@ export default function InsightList({
 
 const styles = StyleSheet.create({
   list: {
-    gap: theme.spacing.md,
+    gap: 0,
   },
   item: {
     flexDirection: "row",
-    backgroundColor: theme.colors.surface.card,
-    borderRadius: theme.radius.md,
-    overflow: "hidden",
+    alignItems: "flex-start",
+    gap: theme.spacing.md,
+    paddingVertical: theme.spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.surface.high,
   },
-  priorityItem: {
-    backgroundColor: theme.colors.surface.high,
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: 8,
   },
-  accent: {
-    width: 3,
-  },
-  accentPriority: {
-    width: 4,
+  number: {
+    fontFamily: theme.fonts.labelBold,
+    fontSize: 13,
+    letterSpacing: 0.5,
+    lineHeight: 20,
+    minWidth: 24,
   },
   body: {
     flex: 1,
-    paddingVertical: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.xs,
-  },
-  numberedHeader: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: theme.spacing.sm,
-    marginBottom: 2,
-  },
-  number: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 18,
-    letterSpacing: -0.5,
-  },
-  priorityTag: {
-    fontFamily: theme.fonts.labelBold,
-    fontSize: 9,
-    letterSpacing: 2,
+    gap: 4,
   },
   text: {
     fontFamily: theme.fonts.body,
@@ -113,6 +76,5 @@ const styles = StyleSheet.create({
   priorityText: {
     fontFamily: theme.fonts.bodyBold,
     fontSize: 15,
-    lineHeight: 22,
   },
 });

@@ -23,7 +23,7 @@ export default function Card({
     <View style={[styles.card, style]}>
       {icon && (
         <View style={styles.iconWrapper}>
-          <Ionicons name={icon} size={18} color={theme.colors.success} />
+          <Ionicons name={icon} size={16} color={theme.colors.positive} />
         </View>
       )}
       <View style={styles.content}>
@@ -54,10 +54,10 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   iconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: "rgba(96, 220, 176, 0.1)",
+    width: 30,
+    height: 30,
+    borderRadius: theme.radius.default,
+    backgroundColor: theme.colors.accent.greenDim,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: theme.fonts.labelBold,
     fontSize: 11,
-    color: theme.colors.success,
+    color: theme.colors.positive,
     letterSpacing: 1.5,
     marginBottom: 4,
   },

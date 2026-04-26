@@ -21,11 +21,8 @@ export default function PerformanceDuel({ best, worst }: PerformanceDuelProps) {
       <PerformanceRow entry={best} variant="best" />
       <View style={styles.separator} />
       <PerformanceRow entry={worst} variant="worst" />
-
-      {/* Delta pill floats on top of the separator */}
       <View style={styles.deltaPill} pointerEvents="none">
-        <Text style={styles.deltaLabel}>Δ</Text>
-        <Text style={styles.deltaValue}>{delta} pts</Text>
+        <Text style={styles.deltaText}>Δ {delta} pts</Text>
       </View>
     </View>
   );
@@ -38,35 +35,30 @@ function PerformanceRow({
   entry: PerformanceEntry;
   variant: "best" | "worst";
 }) {
-  const accent =
-    variant === "best" ? theme.colors.success : theme.colors.primary;
-  const tagLabel = variant === "best" ? "STRONGEST" : "WEAKEST";
-  const clampedWinrate = Math.max(0, Math.min(100, entry.winrate));
+  const accent = variant === "best" ? theme.colors.positive : theme.colors.negative;
+  const tag = variant === "best" ? "BEST" : "WEAKEST";
+  const clamped = Math.max(0, Math.min(100, entry.winrate));
 
   return (
     <View style={styles.row}>
       <View style={styles.rowTop}>
-        <View style={styles.headerBlock}>
-          <Text style={[styles.tag, { color: accent }]}>{tagLabel}</Text>
+        <View style={styles.left}>
+          <Text style={[styles.tag, { color: accent }]}>{tag}</Text>
           <Text style={styles.name}>{entry.name}</Text>
           <Text style={styles.meta}>
             {entry.count} games · K/D {entry.kdRatio.toFixed(2)}
           </Text>
         </View>
-        <View style={styles.winrateWrapper}>
+        <View style={styles.winrateBlock}>
           <Text style={[styles.winrate, { color: accent }]}>
             {Math.round(entry.winrate)}
           </Text>
           <Text style={styles.winrateUnit}>%</Text>
         </View>
       </View>
-
       <View style={styles.barTrack}>
         <View
-          style={[
-            styles.barFill,
-            { width: `${clampedWinrate}%`, backgroundColor: accent },
-          ]}
+          style={[styles.barFill, { width: `${clamped}%`, backgroundColor: accent }]}
         />
       </View>
     </View>
@@ -90,7 +82,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
-  headerBlock: {
+  left: {
     flex: 1,
     gap: 2,
   },
@@ -109,10 +101,10 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.label,
     fontSize: 10,
     color: theme.colors.text.secondary,
-    letterSpacing: 1,
+    letterSpacing: 0.8,
     marginTop: 2,
   },
-  winrateWrapper: {
+  winrateBlock: {
     flexDirection: "row",
     alignItems: "flex-end",
     marginLeft: theme.spacing.md,
@@ -149,24 +141,16 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: "50%",
     right: theme.spacing.lg,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
     paddingHorizontal: 10,
     paddingVertical: 3,
-    backgroundColor: theme.colors.surface.high,
-    borderRadius: 999,
+    backgroundColor: theme.colors.surface.overlay,
+    borderRadius: theme.radius.pill,
     transform: [{ translateY: -10 }],
   },
-  deltaLabel: {
+  deltaText: {
     fontFamily: theme.fonts.labelBold,
     fontSize: 9,
     color: theme.colors.text.secondary,
-  },
-  deltaValue: {
-    fontFamily: theme.fonts.labelBold,
-    fontSize: 9,
-    color: theme.colors.text.primary,
     letterSpacing: 1,
   },
 });
