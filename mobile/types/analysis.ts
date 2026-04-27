@@ -23,6 +23,39 @@ export type CoachingSignals = {
   numberOfAgentPlayed: number;
 };
 
+export type SessionDrift = {
+  firstGameKd: number;
+  laterGamesKd: number;
+  warmupGap: number;
+};
+
+export type MapAgentCrossEntry = {
+  map: string;
+  agent: string;
+  count: number;
+  winrate: number;
+  kdRatio: number;
+  fitDelta: number;
+};
+
+export type ScoreShape = {
+  closeLossRate: number;
+  blowoutLossRate: number;
+  closeWinRate: number;
+};
+
+export type DmCompGap = {
+  dmKd: number;
+  compKd: number;
+  gap: number;
+};
+
+export type WeeklyDelta = {
+  winrateDelta: number;
+  kdDelta: number;
+  consistencyDelta: number;
+};
+
 export type PlayerStats = BaseStats & {
   trend: "improving" | "stable" | "declining";
   totalMatches: number;
@@ -33,23 +66,33 @@ export type PlayerStats = BaseStats & {
   mapSplits: Record<string, SplitStats>;
   agentSplits: Record<string, SplitStats>;
   coachingSignals: CoachingSignals;
+  consistencyScore: number;
+  tiltScore: number;
+  sessionDrift: SessionDrift;
+  mapAgentCross: MapAgentCrossEntry[];
+  scoreShape: ScoreShape;
+  dmCompGap: DmCompGap;
+  weeklyDelta: WeeklyDelta;
 };
 
-export type Coaching = {
-  summary: string;
-  strengths: string[];
-  weaknesses: string[];
-  focusAreas: string[];
-  actionPlan: {
-    title: string;
-    durationDays: number;
-    steps: string[];
-    successCriteria: string;
-  };
+export type WeeklyMission = {
+  goal: string;
+  protocol: string[];
+  successMetric: string;
+  antiPattern: string;
+};
+
+export type CoachingOutput = {
+  headline: string;
+  diagnosis: string;
+  hiddenPattern: string;
+  rootCause: string;
+  counterIntuitive: string;
+  weeklyMission: WeeklyMission;
 };
 
 export type PlayerAnalysisResponse = {
   result: boolean;
   stats: PlayerStats;
-  coaching: Coaching | string;
+  coaching: CoachingOutput | string;
 };
