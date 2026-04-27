@@ -21,7 +21,7 @@ export default function AnalysisTab() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={["top"]}>
         <View style={styles.centerWrapper}>
           <ActivityIndicator size="large" color={theme.colors.accent.green} />
           <Text style={styles.loadingText}>
@@ -34,7 +34,7 @@ export default function AnalysisTab() {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={["top"]}>
         <View style={styles.centerWrapper}>
           <Text style={styles.errorTitle}>Something went wrong</Text>
           <Text style={styles.errorMessage}>{error.message}</Text>
@@ -49,7 +49,7 @@ export default function AnalysisTab() {
   const isCoachingObject = typeof coaching === "object" && coaching !== null;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* Header */}
         <View style={styles.header}>

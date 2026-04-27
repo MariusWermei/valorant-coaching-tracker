@@ -25,14 +25,15 @@ export default function MatchCard({ match }: MatchCardProps) {
           <Text style={styles.agent}>{match.agent}</Text>
         </View>
         <Text style={styles.meta}>
-          {dateLabel} · {match.mode.charAt(0).toUpperCase() + match.mode.slice(1)}
+          {dateLabel} ·{" "}
+          {match.mode.charAt(0).toUpperCase() + match.mode.slice(1)}
         </Text>
       </View>
       <View style={styles.right}>
         <Text style={styles.kda}>
           {match.kills}/{match.deaths}/{match.assists}
         </Text>
-        <Text style={styles.score}>{match.score}</Text>
+        <Text style={styles.score}>{match.score} ACS</Text>
       </View>
     </View>
   );

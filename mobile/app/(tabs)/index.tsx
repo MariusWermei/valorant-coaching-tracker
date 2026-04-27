@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -11,11 +12,12 @@ import { useEffect, useState } from "react";
 import { getPlayerStats, getPlayerMatches } from "@/services/api";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { theme } from "@/constants/theme";
-import Button from "@/components/Button";
 import MetricCard from "@/components/MetricCard";
 import { StatsResponse } from "@/types/stats";
 import { Match } from "@/types/match";
 import MatchCard from "@/components/MatchCard";
+
+const PAGE_SIZE = 10;
 
 export default function OverviewTab() {
   const router = useRouter();
@@ -24,6 +26,7 @@ export default function OverviewTab() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useEffect(() => {
     if (!playerId) return;
@@ -49,7 +52,7 @@ export default function OverviewTab() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={["top"]}>
         <View style={styles.centerWrapper}>
           <ActivityIndicator size="large" color={theme.colors.accent.green} />
           <Text style={styles.loadingText}>Loading performance data...</Text>
@@ -60,8 +63,11 @@ export default function OverviewTab() {
 
   if (!stats) return null;
 
+  const visibleMatches = matches.slice(0, visibleCount);
+  const hasMore = visibleCount < matches.length;
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* Header */}
         <View style={styles.header}>
@@ -92,10 +98,7 @@ export default function OverviewTab() {
               value={`${stats.stats.winrate.toFixed(0)}%`}
               delta={`last ${stats.stats.totalMatches} games`}
             />
-            <MetricCard
-              label="K / D"
-              value={stats.stats.kdRatio.toFixed(2)}
-            />
+            <MetricCard label="K / D" value={stats.stats.kdRatio.toFixed(2)} />
           </View>
           <View style={styles.metricsRow}>
             <MetricCard
@@ -111,26 +114,46 @@ export default function OverviewTab() {
         </View>
 
         {/* CTA */}
-        <View style={styles.ctaCard}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.ctaCard,
+            pressed && styles.ctaPressed,
+          ]}
+          onPress={() => router.push("/(tabs)/analysis")}
+        >
           <View>
             <Text style={styles.ctaLabel}>WEEKLY ANALYSIS READY</Text>
-            <Text style={styles.ctaTitle}>
-              Read your coaching report →
-            </Text>
+            <Text style={styles.ctaTitle}>Read your coaching report →</Text>
           </View>
           <View style={styles.ctaCircle}>
             <Text style={styles.ctaArrow}>→</Text>
           </View>
-        </View>
+        </Pressable>
 
         {/* Recent matches */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>RECENT MATCHES</Text>
           <View style={styles.matchesList}>
-            {matches.slice(0, 10).map((match) => (
+            {visibleMatches.map((match) => (
               <MatchCard key={match.matchId} match={match} />
             ))}
           </View>
+
+          {hasMore && (
+            <View style={{ alignItems: "center" }}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.loadMoreButton,
+                  pressed && styles.loadMorePressed,
+                ]}
+                onPress={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+              >
+                <Text style={styles.loadMoreText}>
+                  LOAD MORE ({matches.length - visibleCount} remaining)
+                </Text>
+              </Pressable>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -144,7 +167,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     padding: theme.spacing.xl,
-    paddingBottom: 90,
+    paddingBottom: 20,
     gap: theme.spacing.xl,
   },
   centerWrapper: {
@@ -225,6 +248,9 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: theme.spacing.lg,
   },
+  ctaPressed: {
+    opacity: 0.8,
+  },
   ctaLabel: {
     fontFamily: theme.fonts.labelBold,
     fontSize: 9,
@@ -261,5 +287,25 @@ const styles = StyleSheet.create({
   },
   matchesList: {
     gap: theme.spacing.lg,
+  },
+  loadMoreButton: {
+    alignItems: "center",
+    paddingVertical: theme.spacing.md,
+    marginTop: theme.spacing.sm,
+    backgroundColor: theme.colors.surface.card,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.surface.high,
+    width: 270,
+  },
+  loadMorePressed: {
+    backgroundColor: theme.colors.surface.high,
+    opacity: 0.9,
+  },
+  loadMoreText: {
+    fontFamily: theme.fonts.labelBold,
+    fontSize: 10,
+    color: theme.colors.text.secondary,
+    letterSpacing: 2,
   },
 });
