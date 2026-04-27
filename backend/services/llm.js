@@ -9,8 +9,8 @@ const askLLM = async (prompt) => {
         stream: false,
         keep_alive: "30m",
         options: {
-          num_predict: 400,
-          temperature: 0.3,
+          num_predict: 1000,
+          temperature: 0.4,
         },
       }),
     });
@@ -22,6 +22,7 @@ const askLLM = async (prompt) => {
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim();
+
     return { response: text };
   } catch (error) {
     return { error: error.message };
