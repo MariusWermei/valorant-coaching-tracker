@@ -75,9 +75,14 @@ export type PlayerStats = BaseStats & {
   weeklyDelta: WeeklyDelta;
 };
 
+export type ProtocolStep = {
+  title: string;
+  description: string;
+};
+
 export type WeeklyMission = {
   goal: string;
-  protocol: string[];
+  protocol: ProtocolStep[];
   successMetric: string;
   antiPattern: string;
 };

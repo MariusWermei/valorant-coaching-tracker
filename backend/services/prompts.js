@@ -47,7 +47,7 @@ STRICT RULES — violations make the output worthless:
 2. EVERY claim must reference a specific number from the data above. No invented stats, no vague causes.
 3. The headline must be a revelation — something the player did not already know. If it could appear on any player's report, rewrite it.
 4. The counterIntuitive field must give advice that goes AGAINST the player's natural reflex. If it sounds obvious, it is wrong.
-5. Each protocol step must specify: game mode, number of games or duration, specific agent if relevant, and one concrete behavior to focus on. "Play ranked" or "analyze replays" are not valid steps.
+5. Each protocol step has a "title" (6-10 words max, the action name) and a "description" (2-3 sentences: exactly what to do — mode, agent, map, duration — one specific behavior to track, and why it directly targets the root cause). "Play ranked" or "analyze replays" as a full description are not valid.
 6. Pedagogical tone: explain the mechanism behind each insight ("when X happens, you tend to Y, because Z").
 7. The successMetric must be grounded in the player's current baseline. Current win rate is ${fmt(stats.winrate)}% — target a realistic +5 to +8 point improvement, not an arbitrary number.
 8. DM vs Comp gap interpretation: gap NEGATIVE (${stats.dmCompGap.gap < 0 ? "like this player" : "not this player"}) means Comp K/D > DM K/D — the player performs better in structured play than in raw aim duels, game sense is their strength. gap POSITIVE means DM K/D > Comp K/D — mechanics are not the bottleneck, game sense and decision-making are. Do not confuse the two directions.
@@ -73,10 +73,15 @@ Respond ONLY with valid JSON. No markdown, no backticks, no explanation outside 
   "rootCause": "the core mechanism driving the plateau or the problem — one sentence",
   "counterIntuitive": "one piece of advice that goes against the player's natural reflex, explained",
   "weeklyMission": {
-    "goal": "one measurable objective for the next 7 days",
-    "protocol": ["specific step 1", "specific step 2", "specific step 3", "specific step 4"],
-    "successMetric": "how the player will know it is working — must reference a measurable stat",
-    "antiPattern": "one specific behavior to stop, with the reason why it is harmful"
+    "goal": "one compelling sentence describing the behavior change this week as an outcome — not a stat target. Frame it as what winning looks like: 'Win 3 extra rounds per session by trading space instead of kills', not '+5% WR'. Must be specific to this player's root cause.",
+    "protocol": [
+      { "title": "short action name (6-10 words)", "description": "2-3 sentences: exactly what to do (mode, agent, map, number of games), one specific in-game behavior to track each round, and why it directly attacks the root cause" },
+      { "title": "short action name (6-10 words)", "description": "2-3 sentences: exactly what to do (mode, agent, map, number of games), one specific in-game behavior to track each round, and why it directly attacks the root cause" },
+      { "title": "short action name (6-10 words)", "description": "2-3 sentences: exactly what to do (mode, agent, map, number of games), one specific in-game behavior to track each round, and why it directly attacks the root cause" },
+      { "title": "short action name (6-10 words)", "description": "2-3 sentences: exactly what to do (mode, agent, map, number of games), one specific in-game behavior to track each round, and why it directly attacks the root cause" }
+    ],
+    "successMetric": "2-3 sentences: how the player will know it is working — cite current baseline stats and what measurable change signals progress (e.g. close-loss rate drops, session-end K/D improves)",
+    "antiPattern": "2-3 sentences: one specific behavior to stop immediately, why it actively reinforces the problem, and what to replace it with"
   }
 }`;
 
