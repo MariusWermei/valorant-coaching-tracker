@@ -105,9 +105,19 @@ const playerAnalysis = async (req, res) => {
 
     let parsedCoaching;
     try {
-      parsedCoaching = JSON.parse(coaching.response);
+      let parsed = JSON.parse(coaching.response);
+      // LLM sometimes double-encodes: JSON.parse returns a string, not an object
+      if (typeof parsed === "string") parsed = JSON.parse(parsed);
+      parsedCoaching = parsed;
     } catch {
-      parsedCoaching = coaching.response;
+      // LLM injected extra text around the JSON — extract the first {...} block
+      try {
+        const match = coaching.response.match(/\{[\s\S]*\}/);
+        if (match) parsedCoaching = JSON.parse(match[0]);
+        else parsedCoaching = coaching.response;
+      } catch {
+        parsedCoaching = coaching.response;
+      }
     }
 
     res.json({ result: true, stats: stats, coaching: parsedCoaching });
