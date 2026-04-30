@@ -4,7 +4,7 @@ const askLLM = async (prompt) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "qwen2.5",
+        model: "qwen2.5:14b",
         prompt: prompt,
         stream: false,
         format: "json",

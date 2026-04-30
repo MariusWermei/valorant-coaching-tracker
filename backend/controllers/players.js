@@ -98,10 +98,17 @@ const playerAnalysis = async (req, res) => {
     }
 
     let matches = player.matches;
-
     const stats = computeAnalysis(matches);
-    const primarySignals = computePrimarySignals(stats);
 
+    if (player.cachedCoaching?.data && req.query.refresh !== "true") {
+      return res.json({
+        result: true,
+        stats,
+        coaching: player.cachedCoaching.data,
+      });
+    }
+
+    const primarySignals = computePrimarySignals(stats);
     const prompt = buildFullCoachingPrompt(stats, primarySignals);
     const coaching = await askLLM(prompt);
 
@@ -119,6 +126,9 @@ const playerAnalysis = async (req, res) => {
         parsedCoaching = coaching.response;
       }
     }
+
+    player.cachedCoaching = { data: parsedCoaching, generatedAt: new Date() };
+    await player.save();
 
     res.json({ result: true, stats: stats, coaching: parsedCoaching });
   } catch (error) {

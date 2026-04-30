@@ -28,6 +28,10 @@ const playerStatsSchema = new mongoose.Schema({
   profileType: String,
   notes: String,
   matches: [playerMatchesSchema],
+  cachedCoaching: {
+    data: mongoose.Schema.Types.Mixed,
+    generatedAt: Date,
+  },
 });
 
 module.exports = mongoose.model("playerstats", playerStatsSchema);
