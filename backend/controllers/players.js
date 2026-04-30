@@ -2,6 +2,7 @@ const PlayerStats = require("../models/players");
 const { computeAnalysis } = require("../services/analysis");
 const { askLLM } = require("../services/llm");
 const { buildFullCoachingPrompt } = require("../services/prompts");
+const { computePrimarySignals } = require("../services/signalRanking");
 
 const playerInfos = async (req, res) => {
   try {
@@ -99,18 +100,17 @@ const playerAnalysis = async (req, res) => {
     let matches = player.matches;
 
     const stats = computeAnalysis(matches);
+    const primarySignals = computePrimarySignals(stats);
 
-    const prompt = buildFullCoachingPrompt(stats);
+    const prompt = buildFullCoachingPrompt(stats, primarySignals);
     const coaching = await askLLM(prompt);
 
     let parsedCoaching;
     try {
       let parsed = JSON.parse(coaching.response);
-      // LLM sometimes double-encodes: JSON.parse returns a string, not an object
       if (typeof parsed === "string") parsed = JSON.parse(parsed);
       parsedCoaching = parsed;
     } catch {
-      // LLM injected extra text around the JSON — extract the first {...} block
       try {
         const match = coaching.response.match(/\{[\s\S]*\}/);
         if (match) parsedCoaching = JSON.parse(match[0]);

@@ -1,4 +1,4 @@
-const buildFullCoachingPrompt = (stats) => {
+const buildFullCoachingPrompt = (stats, primarySignals = []) => {
   const cross = stats.mapAgentCross ?? [];
   const topFits = cross.slice(0, 3);
   const worstFits = cross.slice(-3);
@@ -39,6 +39,11 @@ AGENT POOL:
 - Best agent: ${stats.coachingSignals.bestAgent.name} (${fmt(stats.coachingSignals.bestAgent.winrate)}% WR, K/D ${fmt(stats.coachingSignals.bestAgent.kdRatio, 2)})
 - Worst agent: ${stats.coachingSignals.worstAgent.name} (${fmt(stats.coachingSignals.worstAgent.winrate)}% WR, K/D ${fmt(stats.coachingSignals.worstAgent.kdRatio, 2)})
 - Total agents played: ${stats.coachingSignals.numberOfAgentPlayed}
+
+---
+
+PRIMARY SIGNALS — these are the most distinctive patterns for THIS specific player. Your diagnosis MUST focus on these signals. Do not default to a generic "kills vs rounds" narrative if it is not listed here.
+${primarySignals.map((s, i) => `${i + 1}. ${s}`).join("\n")}
 
 ---
 
