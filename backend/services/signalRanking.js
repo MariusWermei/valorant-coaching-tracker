@@ -5,10 +5,11 @@ const computePrimarySignals = (stats) => {
   const agentRatio =
     stats.coachingSignals.numberOfAgentPlayed / stats.totalMatches;
 
-  if (agentRatio > 0.5) {
+  if (stats.coachingSignals.numberOfAgentPlayed >= 8) {
     signals.push({
-      weight: agentRatio * 100,
-      signal: `AGENT FRAGMENTATION: This player used ${stats.coachingSignals.numberOfAgentPlayed} different agents across ${stats.totalMatches} matches. No agent has enough games to build real competence. The map×agent cross-split is nearly empty because no combo repeats enough.`,
+      weight: stats.coachingSignals.numberOfAgentPlayed * 5,
+      signal: `AGENT FRAGMENTATION: This player used ${stats.coachingSignals.numberOfAgentPlayed} different agents across ${stats.totalMatches} matches. No agent has enough games to build real competence.   
+  Average games per agent: ${Math.round(stats.totalMatches / stats.coachingSignals.numberOfAgentPlayed)}.`,
     });
   }
 
@@ -84,21 +85,26 @@ const computePrimarySignals = (stats) => {
     });
   }
 
-  // ── DM vs Comp gap ───────────────────────────────────────────────
-  const gapMag = Math.abs(stats.dmCompGap.gap);
+  // ── DM practice habits ──────────────────────────────────────────
+  const { dmCount, compCount, dmRatio, practiceFlag, compKd } = stats.dmCompGap;
 
-  if (gapMag >= 0.3) {
-    if (stats.dmCompGap.gap > 0) {
-      signals.push({
-        weight: gapMag * 50,
-        signal: `DM > COMP (${sign(stats.dmCompGap.gap)}): DM K/D ${stats.dmCompGap.dmKd} vs Comp K/D ${stats.dmCompGap.compKd}. Mechanics outpace game sense. The bottleneck is decision-making, not aim.`,
-      });
-    } else {
-      signals.push({
-        weight: gapMag * 70,
-        signal: `COMP > DM (${sign(stats.dmCompGap.gap)}): Comp K/D ${stats.dmCompGap.compKd} vs DM K/D ${stats.dmCompGap.dmKd}. Game sense outpaces mechanics. The bottleneck is mechanical skill, not strategy.`,
-      });
-    }
+  if (practiceFlag === "none" && compKd < 1.0) {
+    signals.push({
+      weight: 35,
+      signal: `NO DM PRACTICE: 0 deathmatch games out of ${stats.totalMatches}. Comp K/D is ${compKd} — player never warms up or trains raw aim. Adding dedicated DM sessions could directly improve
+  mechanical performance.`,
+    });
+  } else if (practiceFlag === "low" && compKd < 1.0) {
+    signals.push({
+      weight: 30,
+      signal: `LOW DM PRACTICE: Only ${dmCount} DM games out of ${stats.totalMatches} (${dmRatio}%). Comp K/D is ${compKd} — player may benefit from more frequent aim training sessions.`,
+    });
+  } else if (practiceFlag === "high" && compKd < 1.0) {
+    signals.push({
+      weight: 40,
+      signal: `HIGH DM BUT WEAK COMP: ${dmCount} DM games (${dmRatio}%) but comp K/D is only ${compKd}. The player trains aim regularly but it does not translate to competitive. The bottleneck is game     
+  sense and decision-making, not mechanics.`,
+    });
   }
 
   // ── Score shape ──────────────────────────────────────────────────

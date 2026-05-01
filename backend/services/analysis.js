@@ -209,18 +209,30 @@ const computeScoreShape = (matches) => {
 const computeDmCompGap = (matches) => {
   const dmMatches = matches.filter((m) => m.mode === "deathmatch");
   const compMatches = matches.filter((m) => m.mode === "competitive");
+  const totalMatches = matches.length;
 
-  if (dmMatches.length === 0 || compMatches.length === 0) {
-    return { dmKd: 0, compKd: 0, gap: 0 };
-  }
+  const dmCount = dmMatches.length;
+  const compCount = compMatches.length;
+  const dmRatio =
+    totalMatches > 0 ? Math.round((dmCount / totalMatches) * 100) : 0;
 
-  const dmKd = Math.round(computeBaseStats(dmMatches).kdRatio * 100) / 100;
-  const compKd = Math.round(computeBaseStats(compMatches).kdRatio * 100) / 100;
+  let practiceFlag = "none";
+  if (dmCount === 0) practiceFlag = "none";
+  else if (dmRatio < 15) practiceFlag = "low";
+  else if (dmRatio <= 30) practiceFlag = "moderate";
+  else practiceFlag = "high";
+
+  const compKd =
+    compCount > 0
+      ? Math.round(computeBaseStats(compMatches).kdRatio * 100) / 100
+      : 0;
 
   return {
-    dmKd,
+    dmCount,
+    compCount,
+    dmRatio,
+    practiceFlag,
     compKd,
-    gap: Math.round((dmKd - compKd) * 100) / 100,
   };
 };
 

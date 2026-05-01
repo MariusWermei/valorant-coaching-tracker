@@ -4,91 +4,94 @@ const buildFullCoachingPrompt = (stats, primarySignals = []) => {
   const worstFits = cross.slice(-3);
 
   const fmt = (n, decimals = 0) =>
-    decimals === 0 ? Math.round(n) : Math.round(n * 10 ** decimals) / 10 ** decimals;
+    decimals === 0
+      ? Math.round(n)
+      : Math.round(n * 10 ** decimals) / 10 ** decimals;
 
   const sign = (n) => (n > 0 ? `+${n}` : `${n}`);
 
-  const prompt = `You are a calm, pedagogical VALORANT performance coach. Your role is to explain mechanisms, not issue verdicts.
-You write like a coach who respects the player's intelligence — you explain WHY something is happening, not just WHAT.
-
----
-
-PLAYER DATA:
-
-BASE STATS:
-- Win rate: ${fmt(stats.winrate)}% (${stats.totalWins}W / ${stats.totalLosses}L over ${stats.totalMatches} matches)
-- K/D ratio: ${fmt(stats.kdRatio, 2)}
-- Average score: ${fmt(stats.averageScore)}
-- Recent trend: ${stats.trend}
-
-DEEP SIGNALS:
-- Consistency score: ${stats.consistencyScore}/100 (100 = perfectly regular, 0 = chaotic variance)
-- Tilt score: ${sign(stats.tiltScore)}% K/D change after a loss (negative = performs worse after losing)
-- Session drift: first game K/D ${stats.sessionDrift.firstGameKd} → later games K/D ${stats.sessionDrift.laterGamesKd} (gap: ${sign(stats.sessionDrift.warmupGap)})
-- Score shape: ${stats.scoreShape.closeLossRate}% close losses (≤2 rounds), ${stats.scoreShape.blowoutLossRate}% blowout losses (≥5 rounds), ${stats.scoreShape.closeWinRate}% close wins
-- DM K/D: ${stats.dmCompGap.dmKd} vs Comp K/D: ${stats.dmCompGap.compKd} (gap: ${sign(stats.dmCompGap.gap)} — positive gap means DM outperforms Comp, suggesting game-sense issue not mechanics)
-- Weekly delta: WR ${sign(stats.weeklyDelta.winrateDelta)}%, K/D ${sign(stats.weeklyDelta.kdDelta)}, consistency ${sign(stats.weeklyDelta.consistencyDelta)} pts
-
-MAP × AGENT FIT (sorted by fit delta — how this combo compares to player's baseline on that agent):
-Best fits:
-${topFits.map((p) => `- ${p.agent} on ${p.map}: ${p.winrate}% WR, K/D ${p.kdRatio} (fit delta: ${sign(p.fitDelta)})`).join("\n")}
-Worst fits:
-${worstFits.map((p) => `- ${p.agent} on ${p.map}: ${p.winrate}% WR, K/D ${p.kdRatio} (fit delta: ${sign(p.fitDelta)})`).join("\n")}
-
-AGENT POOL:
-- Best agent: ${stats.coachingSignals.bestAgent.name} (${fmt(stats.coachingSignals.bestAgent.winrate)}% WR, K/D ${fmt(stats.coachingSignals.bestAgent.kdRatio, 2)})
-- Worst agent: ${stats.coachingSignals.worstAgent.name} (${fmt(stats.coachingSignals.worstAgent.winrate)}% WR, K/D ${fmt(stats.coachingSignals.worstAgent.kdRatio, 2)})
-- Total agents played: ${stats.coachingSignals.numberOfAgentPlayed}
-
----
-
-PRIMARY SIGNALS — these are the most distinctive patterns for THIS specific player. Your diagnosis MUST focus on these signals. Do not default to a generic "kills vs rounds" narrative if it is not listed here.
-${primarySignals.map((s, i) => `${i + 1}. ${s}`).join("\n")}
-
----
-
-STRICT RULES — violations make the output worthless:
-1. NEVER write catalog sentences: "good K/D", "consistent win rate", "improve your aim", "work on your weaknesses", "focus on mechanics". These are banned.
-2. EVERY claim must reference a specific number from the data above. No invented stats, no vague causes.
-3. The headline must be a revelation — something the player did not already know. If it could appear on any player's report, rewrite it.
-4. The counterIntuitive field must give advice that goes AGAINST the player's natural reflex. If it sounds obvious, it is wrong.
-5. Each protocol step has a "title" (6-10 words max, the action name) and a "description" (2-3 sentences: exactly what to do — mode, agent, map, duration — one specific behavior to track, and why it directly targets the root cause). "Play ranked" or "analyze replays" as a full description are not valid.
-6. Pedagogical tone: explain the mechanism behind each insight ("when X happens, you tend to Y, because Z").
-7. The successMetric must be grounded in the player's current baseline. Current win rate is ${fmt(stats.winrate)}% — target a realistic +5 to +8 point improvement, not an arbitrary number.
-8. DM vs Comp gap interpretation: gap NEGATIVE (${stats.dmCompGap.gap < 0 ? "like this player" : "not this player"}) means Comp K/D > DM K/D — the player performs better in structured play than in raw aim duels, game sense is their strength. gap POSITIVE means DM K/D > Comp K/D — mechanics are not the bottleneck, game sense and decision-making are. Do not confuse the two directions.
-
-EXAMPLE OF BAD OUTPUT (do not produce this):
-- headline: "You have strong mechanics but need to work on consistency"
-- diagnosis: "Your K/D is good but your win rate could be higher. Focus on your worst maps."
-- counterIntuitive: "Play more deathmatch to improve your aim"
-
-EXAMPLE OF GOOD OUTPUT (produce this quality):
-- headline: "You are winning gunfights and losing rounds — your K/D is hiding a structural problem"
-- diagnosis: "Your DM K/D exceeds your competitive K/D by +0.4, which means mechanics are not the bottleneck. Yet the majority of your losses are close (13-11 range). You are individually strong but not converting that into round wins — you trade kills instead of trading space."
-- counterIntuitive: "Stop grinding deathmatch. Every DM session reinforces the individual-play reflex that is actively hurting your win rate. Your problem is collective, not mechanical."
-
----
-
-Respond ONLY with valid JSON. No markdown, no backticks, no explanation outside the JSON.
-
-{
-  "headline": "one short revelatory sentence — must surprise the player",
-  "diagnosis": "2-3 sentences explaining what is really happening and why, citing specific numbers",
-  "hiddenPattern": "one non-obvious pattern the player likely missed, explained with data",
-  "rootCause": "the core mechanism driving the plateau or the problem — one sentence",
-  "counterIntuitive": "one piece of advice that goes against the player's natural reflex, explained",
-  "weeklyMission": {
-    "goal": "one compelling sentence describing the behavior change this week as an outcome — not a stat target. Frame it as what winning looks like: 'Win 3 extra rounds per session by trading space instead of kills', not '+5% WR'. Must be specific to this player's root cause.",
-    "protocol": [
-      { "title": "short action name (6-10 words)", "description": "2-3 sentences: exactly what to do (mode, agent, map, number of games), one specific in-game behavior to track each round, and why it directly attacks the root cause" },
-      { "title": "short action name (6-10 words)", "description": "2-3 sentences: exactly what to do (mode, agent, map, number of games), one specific in-game behavior to track each round, and why it directly attacks the root cause" },
-      { "title": "short action name (6-10 words)", "description": "2-3 sentences: exactly what to do (mode, agent, map, number of games), one specific in-game behavior to track each round, and why it directly attacks the root cause" },
-      { "title": "short action name (6-10 words)", "description": "2-3 sentences: exactly what to do (mode, agent, map, number of games), one specific in-game behavior to track each round, and why it directly attacks the root cause" }
-    ],
-    "successMetric": "2-3 sentences: how the player will know it is working — cite current baseline stats and what measurable change signals progress (e.g. close-loss rate drops, session-end K/D improves)",
-    "antiPattern": "2-3 sentences: one specific behavior to stop immediately, why it actively reinforces the problem, and what to replace it with"
+  const prompt = `THIS PLAYER'S #1 ISSUE: ${primarySignals[0] || "No dominant signal."}                                                                                                                      
+                  
+  Your ENTIRE analysis — headline, diagnosis, hiddenPattern, rootCause, counterIntuitive, weeklyMission — MUST center on this issue. Everything else is secondary context.
+                                                                                                                                                                                                               
+  ${
+    primarySignals.length > 1
+      ? `Secondary signals:\n${primarySignals
+          .slice(1)
+          .map((s, i) => `${i + 2}. ${s}`)
+          .join("\n")}`
+      : ""
   }
-}`;
+                                                                                                                                                                                                               
+  You are a pedagogical VALORANT coach. You explain mechanisms: "when X happens, you tend to Y, because Z." You cite specific numbers.
+                                                                                                                                                                                                               
+  ---             
+                                                                                                                                                                                                               
+  PLAYER DATA:    
+
+  BASE STATS:
+  - Win rate: ${fmt(stats.winrate)}% (${stats.totalWins}W / ${stats.totalLosses}L over ${stats.totalMatches} matches)
+  - K/D ratio: ${fmt(stats.kdRatio, 2)}                                                                                                                                                                        
+  - Average score: ${fmt(stats.averageScore)}
+  - Recent trend: ${stats.trend}                                                                                                                                                                               
+                  
+  DEEP SIGNALS:
+  - Consistency score: ${stats.consistencyScore}/100                                                                                                                                                           
+  - Tilt score: ${sign(stats.tiltScore)}% K/D change after a loss
+  - Session drift: first game K/D ${stats.sessionDrift.firstGameKd} → later games K/D ${stats.sessionDrift.laterGamesKd} (gap: ${sign(stats.sessionDrift.warmupGap)})                                          
+  - Score shape: ${stats.scoreShape.closeLossRate}% close losses, ${stats.scoreShape.blowoutLossRate}% blowout losses, ${stats.scoreShape.closeWinRate}% close wins                                            
+  - DM practice: ${stats.dmCompGap.dmCount} DM games out of ${stats.totalMatches} (${stats.dmCompGap.dmRatio}%). Practice level: ${stats.dmCompGap.practiceFlag}. Comp K/D: ${stats.dmCompGap.compKd}          
+  - Weekly delta: WR ${sign(stats.weeklyDelta.winrateDelta)}%, K/D ${sign(stats.weeklyDelta.kdDelta)}, consistency ${sign(stats.weeklyDelta.consistencyDelta)} pts                                             
+                                                                                                                                                                                                               
+  MAP × AGENT FIT:                                                                                                                                                                                             
+  Best: ${topFits.map((p) => `${p.agent}/${p.map} ${p.winrate}%WR K/D ${p.kdRatio} (${sign(p.fitDelta)})`).join(" | ")}                                                                                        
+  Worst: ${worstFits.map((p) => `${p.agent}/${p.map} ${p.winrate}%WR K/D ${p.kdRatio} (${sign(p.fitDelta)})`).join(" | ")}                                                                                     
+                                                                                                                                                                                                               
+  AGENT POOL:                                                                                                                                                                                                  
+  - Best: ${stats.coachingSignals.bestAgent.name} (${fmt(stats.coachingSignals.bestAgent.winrate)}% WR, K/D ${fmt(stats.coachingSignals.bestAgent.kdRatio, 2)})                                                
+  - Worst: ${stats.coachingSignals.worstAgent.name} (${fmt(stats.coachingSignals.worstAgent.winrate)}% WR, K/D ${fmt(stats.coachingSignals.worstAgent.kdRatio, 2)})                                            
+  - Total agents played: ${stats.coachingSignals.numberOfAgentPlayed}                                                                                                                                          
+                                                                                                                                                                                                               
+  ---                                                                                                                                                                                                          
+                  
+  RULES:
+  1. Every claim cites a specific number from the data above. Never invent statistics not listed.
+  2. Headline must surprise THIS player. If it could apply to anyone, rewrite it.                                                                                                                              
+  3. counterIntuitive must go AGAINST the player's natural reflex. If it sounds obvious, it is wrong.
+  4. VALORANT constraints: maps are RANDOM in matchmaking (never suggest choosing a map). Agents are RANDOM in deathmatch with all abilities disabled (never suggest choosing an agent in DM or practicing     
+  abilities in DM). DM is pure aim training only.                                                                                                                                                              
+  5. Protocol descriptions must be 2-3 sentences each, describing a behavioral focus during games the player naturally plays. Each must include what to do, when, and one specific thing to track.             
+                                                                                                                                                                                                               
+  Protocol examples to imitate:
+  - "During your next 10 competitive games, call out one enemy position per round before taking any duel. This builds the habit of info-gathering before committing, which directly reduces unnecessary        
+  deaths."                                                                                                                                                                                                     
+  - "Play 3 DM games before each comp session as crosshair placement warmup. Focus on keeping crosshair at head level around every corner, not on the scoreboard."                                             
+  - "If you lose 2 comp games in a row, stop for 15 minutes. Identify one fight per lost game you should not have taken. This breaks the tilt cycle of re-queuing on autopilot."                               
+  - "In your next competitive games, track how many times per half you take a duel without a teammate ready to trade. Aim for zero solo duels — this forces you to play with your team instead of              
+  solo-carrying."                                                                                                                                                                                              
+                                                                                                                                                                                                               
+  ---                                                                                                                                                                                                          
+                  
+  Respond ONLY with valid JSON. No markdown, no backticks, no text outside the JSON.
+
+  {
+    "headline": "one short revelatory sentence about the #1 issue",
+    "diagnosis": "2-3 sentences explaining what is happening and why, citing numbers from the data",                                                                                                           
+    "hiddenPattern": "one non-obvious pattern the player missed, explained with data",
+    "rootCause": "the core mechanism driving the problem — one clear sentence",                                                                                                                                
+    "counterIntuitive": "one advice that goes against the player's reflex, explained in 2-3 sentences",
+    "weeklyMission": {                                                                                                                                                                                         
+      "goal": "one sentence: what winning looks like this week, tied to the #1 issue",
+      "protocol": [                                                                                                                                                                                            
+        { "title": "6-10 word action name", "description": "2-3 sentences: what to do, when, one thing to track, why it targets the root cause" },
+        { "title": "6-10 word action name", "description": "2-3 sentences: what to do, when, one thing to track, why it targets the root cause" },                                                             
+        { "title": "6-10 word action name", "description": "2-3 sentences: what to do, when, one thing to track, why it targets the root cause" },                                                             
+        { "title": "6-10 word action name", "description": "2-3 sentences: what to do, when, one thing to track, why it targets the root cause" }                                                              
+      ],                                                                                                                                                                                                       
+      "successMetric": "2-3 sentences: current baseline numbers and what change signals progress",
+      "antiPattern": "2-3 sentences: one behavior to stop, why it reinforces the problem, what to do instead"                                                                                                  
+    }             
+  }`;
 
   return prompt;
 };
