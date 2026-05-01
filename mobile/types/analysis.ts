@@ -45,9 +45,11 @@ export type ScoreShape = {
 };
 
 export type DmCompGap = {
-  dmKd: number;
+  dmCount: number;
+  compCount: number;
+  dmRatio: number;
+  practiceFlag: "none" | "low" | "moderate" | "high";
   compKd: number;
-  gap: number;
 };
 
 export type WeeklyDelta = {

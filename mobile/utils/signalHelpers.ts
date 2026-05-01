@@ -27,7 +27,9 @@ export type StatRowData = {
 
 export function computeSignalScores(stats: PlayerStats): SignalScores {
   const consistencyColor =
-    stats.consistencyScore >= 60 ? theme.colors.positive : theme.colors.negative;
+    stats.consistencyScore >= 60
+      ? theme.colors.positive
+      : theme.colors.negative;
 
   const tiltResilience = Math.max(0, Math.min(100, 100 + stats.tiltScore));
   const tiltColor =
@@ -35,17 +37,28 @@ export function computeSignalScores(stats: PlayerStats): SignalScores {
 
   const sessionDriftScore = Math.max(
     0,
-    Math.min(100, Math.round(100 - Math.abs(stats.sessionDrift.warmupGap) * 150))
+    Math.min(
+      100,
+      Math.round(100 - Math.abs(stats.sessionDrift.warmupGap) * 150),
+    ),
   );
   const sessionDriftColor =
     stats.sessionDrift.warmupGap < -0.1
       ? theme.colors.negative
       : theme.colors.positive;
 
-  return { consistencyColor, tiltResilience, tiltColor, sessionDriftScore, sessionDriftColor };
+  return {
+    consistencyColor,
+    tiltResilience,
+    tiltColor,
+    sessionDriftScore,
+    sessionDriftColor,
+  };
 }
 
-export function buildSignalDescriptions(stats: PlayerStats): SignalDescriptions {
+export function buildSignalDescriptions(
+  stats: PlayerStats,
+): SignalDescriptions {
   const consistencyDesc =
     stats.consistencyScore >= 80
       ? "Performance spread is tight — you show up every session."
@@ -89,20 +102,30 @@ export function buildStatRows(stats: PlayerStats): StatRowData {
       ? `${blowoutLossRate}% of your losses are blowouts (≥5 rounds). When you lose, you lose hard.`
       : `${closeLossRate}% of your losses are close (≤2 rounds). You're competitive but lose key moments.`;
 
-  const { dmKd, compKd, gap } = stats.dmCompGap;
-  const dmCompValue = `${gap > 0 ? "+" : ""}${gap}`;
+  const { dmCount, dmRatio, practiceFlag, compKd } = stats.dmCompGap;
+  const dmCompValue = practiceFlag.toUpperCase();
   const dmCompColor =
-    gap > 0
+    practiceFlag === "high" || practiceFlag === "moderate"
       ? theme.colors.positive
-      : gap < 0
-        ? theme.colors.negative
-        : theme.colors.text.secondary;
+      : practiceFlag === "low"
+        ? theme.colors.warning
+        : theme.colors.negative;
   const dmCompDesc =
-    gap > 0.2
-      ? `Your deathmatch K/D exceeds competitive by ${gap} — mechanics aren't the bottleneck.`
-      : gap < -0.2
-        ? `You perform better in competitive (${compKd}) than deathmatch (${dmKd}). Game sense is your weapon.`
-        : `Your DM and competitive K/D are aligned — no significant gap.`;
+    practiceFlag === "none"
+      ? `No deathmatch games. ${compKd < 1.0 ? "With a comp K/D of " + compKd + ", adding DM warmups could help." : "Not necessarily an issue given your comp K/D."}`
+      : practiceFlag === "low"
+        ? `Only ${dmCount} DM games (${dmRatio}%). ${compKd < 1.0 ? "Your comp K/D of " + compKd + " suggests more aim training would help." : "Your comp performance is solid regardless."}`
+        : practiceFlag === "high" && compKd < 1.0
+          ? `${dmCount} DM games (${dmRatio}%) but comp K/D is ${compKd}. You train aim regularly — the bottleneck is game sense.`
+          : `${dmCount} DM games (${dmRatio}%). Good practice habits with a comp K/D of ${compKd}.`;
 
-  return { mapAgentBigValue, mapAgentDesc, scoreShapeValue, scoreShapeDesc, dmCompValue, dmCompColor, dmCompDesc };
+  return {
+    mapAgentBigValue,
+    mapAgentDesc,
+    scoreShapeValue,
+    scoreShapeDesc,
+    dmCompValue,
+    dmCompColor,
+    dmCompDesc,
+  };
 }

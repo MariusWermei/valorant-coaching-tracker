@@ -30,7 +30,9 @@ export default function AnalysisTab() {
       <SafeAreaView style={styles.container} edges={["top"]}>
         <View style={styles.centerWrapper}>
           <ActivityIndicator size="large" color={theme.colors.accent.green} />
-          <Text style={styles.loadingText}>Generating coaching insights...</Text>
+          <Text style={styles.loadingText}>
+            Generating coaching insights...
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -52,23 +54,37 @@ export default function AnalysisTab() {
   const { stats, coaching } = data;
   const isCoachingObject = typeof coaching === "object" && coaching !== null;
 
-  const { consistencyColor, tiltResilience, tiltColor, sessionDriftScore, sessionDriftColor } =
-    computeSignalScores(stats);
-  const { consistencyDesc, tiltDesc, driftDesc } = buildSignalDescriptions(stats);
-  const { mapAgentBigValue, mapAgentDesc, scoreShapeValue, scoreShapeDesc, dmCompValue, dmCompColor, dmCompDesc } =
-    buildStatRows(stats);
+  const {
+    consistencyColor,
+    tiltResilience,
+    tiltColor,
+    sessionDriftScore,
+    sessionDriftColor,
+  } = computeSignalScores(stats);
+  const { consistencyDesc, tiltDesc, driftDesc } =
+    buildSignalDescriptions(stats);
+  const {
+    mapAgentBigValue,
+    mapAgentDesc,
+    scoreShapeValue,
+    scoreShapeDesc,
+    dmCompValue,
+    dmCompColor,
+    dmCompDesc,
+  } = buildStatRows(stats);
 
   const today = new Date();
   const weekStart = new Date(today);
   weekStart.setDate(today.getDate() - 6);
   const fmt = (d: Date) =>
-    d.toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase();
+    d
+      .toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      .toUpperCase();
   const weekLabel = `WEEKLY DIAGNOSIS · ${fmt(weekStart)} – ${fmt(today)}`;
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.scroll}>
-
         {/* ── Diagnosis hero ──────────────────────────────────────────────── */}
         <View style={styles.diagnosisSection}>
           <Text style={styles.weekLabel}>{weekLabel}</Text>
@@ -147,7 +163,7 @@ export default function AnalysisTab() {
             description={scoreShapeDesc}
           />
           <StatRow
-            label="DM → COMP GAP"
+            label="DM TRAINING"
             bigValue={dmCompValue}
             bigValueColor={dmCompColor}
             description={dmCompDesc}
@@ -211,7 +227,6 @@ export default function AnalysisTab() {
             <Text style={styles.diagnosisText}>{coaching}</Text>
           </View>
         )}
-
       </ScrollView>
     </SafeAreaView>
   );
